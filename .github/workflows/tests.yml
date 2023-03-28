@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: 🔋Install dependencies
+      - name: 🔋 Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install black isort mypy pytest coverage
@@ -26,8 +26,12 @@ jobs:
 
       - name: 🧪 Unit Tests
         run: |
-          pytest --version
-          coverage --version
+          PYTEST_VERSION="$(pytest --version)"
+          COVERAGE_VERSION="$(coverage --version | grep Coverage.py | sed -e 's/\(.*\)version //g' | sed -e 's/ \(.*\)//g')"
+          
+          echo "🧪 $PYTEST_VERSION"
+          echo "📊 coverage $COVERAGE_VERSION"
+
           coverage run -m pytest -vv --junit-xml=junit.xml .
           coverage report -m
 
@@ -47,6 +51,8 @@ jobs:
           echo "🖤 $BLACK_VERSION"
           black -l 120 --diff --check .
           
+          BLACK_RC=$?
+          
           # -------------------------------------------------------
           # ###                   🔄 isort                      ###
           # -------------------------------------------------------
@@ -57,7 +63,9 @@ jobs:
           ISORT_VERSION="$(isort --version | grep 'VERSION' | sed -e 's/\(.*\)VERSION //g')"
           
           echo "🔄 isort $ISORT_VERSION"
-          isort -l 120 --check .
+          isort -l 120 --diff --check .
+          
+          ISORT_RC=$?
           
           # -------------------------------------------------------
           # ###                   🏷 mypy                       ###
@@ -70,3 +78,8 @@ jobs:
           
           echo "🏷 $MYPY_VERSION"
           mypy .
+          
+          MYPY_RC=$?
+          
+          # -------------------------------------------------------
+          if [[ $BLACK_RC -ne 0 || $ISORT_RC -ne 0 || MYPY_RC -ne 0 ]]; then echo "🚫 Incorrect formatting, you have to clean this up a bit 🧹 🚮" && exit 1; else echo "👏 Good job! Codestyle is awesome 👌"; fi
