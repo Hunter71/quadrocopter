@@ -47,7 +47,7 @@ class PathFinder:
         Note: Using LIFO will allow quickly fall back to the latest possible path, that was not yet tested,
               as LIFO implementation is about picking the most recently stored item from the stack.
         """
-        stack = LifoQueue()
+        stack: LifoQueue = LifoQueue()
         for t in start_transmitters:
             stack.put([t])
 

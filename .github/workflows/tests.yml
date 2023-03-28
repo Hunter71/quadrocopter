@@ -1,0 +1,72 @@
+name: 🏅Quality
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: 🔋Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort mypy pytest coverage
+          if [ -f requirements.txt ]; then pip install --force-reinstall -r requirements.txt; fi
+
+      - name: 🧪 Unit Tests
+        run: |
+          pytest --version
+          coverage --version
+          coverage run -m pytest -vv --junit-xml=junit.xml .
+          coverage report -m
+
+      - name: 🎨 Codestyle
+        run: |
+          echo "🎨 Start codestyle checking"
+          # -------------------------------------------------------
+          # ###                   🖤 black                      ###
+          # -------------------------------------------------------
+          # Return codes for black (rc)
+          #   0 - nothing would change
+          #   1 - some files require formatting
+          # 123 - internal error
+          
+          BLACK_VERSION="$(poetry run black --version | sed 's/, version//g')"
+          
+          echo "🖤 $BLACK_VERSION"
+          black -l 120 --diff --check .
+          
+          # -------------------------------------------------------
+          # ###                   🔄 isort                      ###
+          # -------------------------------------------------------
+          # Return codes for isort (rc)
+          #   0 - nothing would change
+          #   1 - some files require formatting
+          
+          ISORT_VERSION="$(poetry run isort --version | grep 'VERSION' | sed -e 's/\(.*\)VERSION //g')"
+          
+          echo "🔄 isort $ISORT_VERSION"
+          isort -l 120 --check .
+          
+          # -------------------------------------------------------
+          # ###                   🏷 mypy                       ###
+          # -------------------------------------------------------
+          # Return codes for mypy (rc)
+          #   0 - there are no typing errors
+          #   1 - typing errors found, should be fixed 😜
+          
+          MYPY_VERSION="$(poetry run mypy --version)"
+          
+          echo "🏷 $MYPY_VERSION"
+          mypy .
