@@ -42,7 +42,7 @@ jobs:
           #   1 - some files require formatting
           # 123 - internal error
           
-          BLACK_VERSION="$(poetry run black --version | sed 's/, version//g')"
+          BLACK_VERSION="$(black --version | sed 's/, version//g')"
           
           echo "🖤 $BLACK_VERSION"
           black -l 120 --diff --check .
@@ -54,7 +54,7 @@ jobs:
           #   0 - nothing would change
           #   1 - some files require formatting
           
-          ISORT_VERSION="$(poetry run isort --version | grep 'VERSION' | sed -e 's/\(.*\)VERSION //g')"
+          ISORT_VERSION="$(isort --version | grep 'VERSION' | sed -e 's/\(.*\)VERSION //g')"
           
           echo "🔄 isort $ISORT_VERSION"
           isort -l 120 --check .
@@ -66,7 +66,7 @@ jobs:
           #   0 - there are no typing errors
           #   1 - typing errors found, should be fixed 😜
           
-          MYPY_VERSION="$(poetry run mypy --version)"
+          MYPY_VERSION="$(mypy --version)"
           
           echo "🏷 $MYPY_VERSION"
           mypy .
