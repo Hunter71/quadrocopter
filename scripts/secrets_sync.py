@@ -53,9 +53,8 @@ def sync_secrets(public_key_id, public_key):
         secret_name = f"{secret['name']}_{ENVIRONMENT.upper()}"
         if secret_value := os.getenv(secret["name"]):
             print(secret_name, secret_value)
-            assert secret_value in [f"{ENVIRONMENT}-app-id", f"{ENVIRONMENT}-app-secret"]
-        # encrypted_value = encrypt_secret(public_key, secret_value)
-        # create_or_update_repo_secret(secret_name, encrypted_value, public_key_id)
+            encrypted_value = encrypt_secret(public_key, secret_value)
+            create_or_update_repo_secret(secret_name, encrypted_value, public_key_id)
 
 if __name__ == '__main__':
     public_key_info = get_public_key()
