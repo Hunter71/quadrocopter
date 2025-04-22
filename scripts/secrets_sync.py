@@ -51,8 +51,9 @@ def sync_secrets(public_key_id, public_key):
         secrets = get_environment_secrets(env)
         for secret in secrets:
             secret_name = f"{secret['name']}_{env.upper()}"
+            secret_value = os.getenv(secret["name"])
             # secret_value = secret['value']  # Assuming you have access to the plain value
-            print(secret.keys())
+            print(secret_value)
             # encrypted_value = encrypt_secret(public_key, secret_value)
             # create_or_update_repo_secret(secret_name, encrypted_value, public_key_id)
 
